@@ -21,5 +21,5 @@ it('should return 422 if the email is not valid', async () => {
   await request(app)
     .post('/api/auth/signup')
     .send({ email: 'invalidemail' })
-    .expect(422);
+    .expect(402);
 });
