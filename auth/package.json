@@ -12,8 +12,7 @@
     "start:dev": "nodemon src/index.ts",
     "test": "jest --detectOpenHandles",
     "test:watch": "jest --verbose --watchAll --no-cache --runInBand",
-    "tsc:check": "tsc --noEmit",
-    "prepare": "husky install"
+    "tsc:check": "tsc --noEmit"
   },
   "jest": {
     "testEnvironment": "node",
@@ -43,7 +42,6 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-prettier": "^5.1.2",
-    "husky": "^8.0.0",
     "jest": "^29.7.0",
     "lint-staged": "^15.2.0",
     "prettier": "^3.1.1",
@@ -52,14 +50,15 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged",
-      "pre-push": "npm test"
+      "pre-commit": "lint-staged"
     }
   },
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
-      "pretty-quick --staged",
-      "eslint --fix"
+      "npm run prettier:fix",
+      "npm run lint",
+      "npm run test",
+      "git add"
     ]
   }
 }
