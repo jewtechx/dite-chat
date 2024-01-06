@@ -10,8 +10,8 @@
     "prettier:fix": "prettier --write .",
     "start": "NODE_ENV=production ts-node src/index.ts",
     "start:dev": "nodemon src/index.ts",
-    "test": "jest --watchAll --no-cache --detectOpenHandles",
-    "test:watch": "jest --verbose --watchAll --no-cache --runInBand",
+    "test": "jest",
+    "test:watch": "jest --verbose --watchAll --no-cache --runInBand --detectOpenHandles",
     "tsc:check": "tsc --noEmit"
   },
   "jest": {
@@ -48,10 +48,16 @@
     "supertest": "^6.3.3",
     "ts-jest": "^29.1.1"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
   "lint-staged": {
-    "src/**/*.ts": [
+    "src/**/*.{ts,tsx}": [
       "npm run prettier:fix",
       "npm run lint",
+      "npm run test",
       "git add"
     ]
   }
