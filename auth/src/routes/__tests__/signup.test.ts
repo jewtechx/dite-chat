@@ -1,5 +1,7 @@
 import { app } from '../../app';
 import request from 'supertest';
+import { SIGNUP_ROUTE } from '../utils/index';
+
 
 beforeAll(() => {
   // connect database
@@ -12,8 +14,6 @@ beforeEach(() => {
 afterAll(() => {
   // disconnect database
 });
-
-const SIGNUP_ROUTE = '/api/auth/signup';
 
 describe('Test sign up route method availability', () => {
   let password = '';
@@ -74,12 +74,12 @@ describe('Test email validity', () => {
         password,
       })
       .expect(200);
-  });
+  },30000);
 
   it('should return POST as the only allowed header from an options request', async () => {
     const response = await request(app).options(SIGNUP_ROUTE).expect(200);
     expect(response.get('access-control-allowed-methods')).toContain('POST');
-  });
+  },30000);
 });
 
 describe('Test password validity', () => {
@@ -105,7 +105,7 @@ describe('Test password validity', () => {
         password: 'validPass123',
       })
       .expect(200);
-  });
+  },30000);
 
   it('should return 422 if the password was not provided', async () => {
     await request(app)

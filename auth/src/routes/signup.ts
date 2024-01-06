@@ -1,13 +1,13 @@
 import express, { Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { handleMethodsNotAllowed } from './utils';
+import { SIGNUP_ROUTE } from './utils/index';
+
 
 interface BodyInterface {
   email: string;
   password:string;
 }
-
-export const SIGNUP_ROUTE = '/api/auth/signup';
 
 const signUpRouter = express.Router();
 
