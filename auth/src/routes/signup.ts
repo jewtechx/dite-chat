@@ -31,6 +31,14 @@ signUpRouter.post(
     if (!errors.isEmpty()) {
       res.status(422).send({});
     }
+    
+    if (/.+@[A-Z]/g.test(req.body.email)) {
+      res.status(422).send({});
+    }
+    
+    if (/[><'"/]/g.test(req.body.password)) {
+      res.status(422).send({});
+    }
   },
 );
 
