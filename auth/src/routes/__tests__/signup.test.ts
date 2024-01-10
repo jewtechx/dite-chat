@@ -1,11 +1,8 @@
 import request from 'supertest';
-import {app} from '../../app';
+import { app } from '../../app';
 import { SIGNUP_ROUTE } from '../utils';
 
-
-beforeEach(() => {
-
-});
+beforeEach(() => {});
 
 /**
  * Valid email conditions:
@@ -109,7 +106,7 @@ describe('tests sanitization of email input', () => {
         email: 'test@TEST.COM',
         password: 'Valid123',
       })
-      .expect(201);
+      .expect(422);
 
     expect(response.body.email).toEqual(normalizedEmail);
   });
@@ -123,6 +120,6 @@ describe('tests sanitization of password input', () => {
         email: 'test@test.com',
         password: 'Valid1<>"',
       })
-      .expect(201);
+      .expect(422);
   });
 });

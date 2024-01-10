@@ -6,7 +6,7 @@ This a web sockets project that allows users to communicate in real time from an
 * React
 * ExpressJS - using the microservice achitecture
 
-## Contributors
+## Contribution
 Thank you for considering this option to collaborate on this project as a meticulous developer. Working on this project will help enhance your best coding practices and development lifecylce. Kindly fork the repo and make pull requests on the main branch and I can assure you instant review
 
 ## Author

@@ -3,10 +3,9 @@ import { body, validationResult } from 'express-validator';
 import { handleMethodsNotAllowed } from './utils';
 import { SIGNUP_ROUTE } from './utils/index';
 
-
 interface BodyInterface {
   email: string;
-  password:string;
+  password: string;
 }
 
 const signUpRouter = express.Router();
@@ -31,11 +30,11 @@ signUpRouter.post(
     if (!errors.isEmpty()) {
       res.status(422).send({});
     }
-    
+
     if (/.+@[A-Z]/g.test(req.body.email)) {
       res.status(422).send({});
     }
-    
+
     if (/[><'"/]/g.test(req.body.password)) {
       res.status(422).send({});
     }
@@ -51,7 +50,6 @@ signUpRouter.options(SIGNUP_ROUTE, (req: Request, res: Response) => {
   );
   res.sendStatus(200);
 });
-
 
 signUpRouter.get(SIGNUP_ROUTE, handleMethodsNotAllowed);
 signUpRouter.put(SIGNUP_ROUTE, handleMethodsNotAllowed);
