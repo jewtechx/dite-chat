@@ -30,7 +30,7 @@ describe('tests validity of email input', () => {
     await request(app)
       .post(SIGNUP_ROUTE)
       .send({ email: 'test@test.com', password })
-      .expect(201);
+      .expect(200);
   });
 });
 
@@ -92,7 +92,7 @@ describe('tests validity of password input', () => {
     await request(app)
       .post(SIGNUP_ROUTE)
       .send({ email, password: 'Valid12valid12' })
-      .expect(201);
+      .expect(200);
   });
 });
 
@@ -106,7 +106,7 @@ describe('tests sanitization of email input', () => {
         email: 'test@TEST.COM',
         password: 'Valid123',
       })
-      .expect(422);
+      .expect(200);
 
     expect(response.body.email).toEqual(normalizedEmail);
   });
@@ -120,6 +120,28 @@ describe('tests sanitization of password input', () => {
         email: 'test@test.com',
         password: 'Valid1<>"',
       })
-      .expect(422);
+      .expect(200);
   });
 });
+
+
+describe('Test saving the signed up user in the database' , () => {
+
+  const userInfo = {
+    email : 'test@test.com',
+    password: 'Valid123'
+  }
+
+  it('saves the user successfully as long as the information is valid', async() => {
+    const response = await request(app)
+    .post(SIGNUP_ROUTE)
+    .send(userInfo)
+    .expect(200)
+
+    expect(response.body.email).toEqual(userInfo.email)
+  })
+
+  it('does not allow saving a user with a duplicate email' , () => {
+
+  })
+})
