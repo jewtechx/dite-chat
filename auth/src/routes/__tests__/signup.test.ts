@@ -1,6 +1,7 @@
 import request from 'supertest';
 import { app } from '../../app';
 import { SIGNUP_ROUTE } from '../utils';
+import { User } from '../../models/user';
 
 beforeEach(() => {});
 
@@ -124,24 +125,29 @@ describe('tests sanitization of password input', () => {
   });
 });
 
-
-describe('Test saving the signed up user in the database' , () => {
-
+describe('Test saving the signed up user in the database', () => {
   const userInfo = {
-    email : 'test@test.com',
-    password: 'Valid123'
-  }
+    email: 'test@test.com',
+    password: 'Valid123',
+  };
 
-  it('saves the user successfully as long as the information is valid', async() => {
+  it('saves the user successfully as long as the information is valid', async () => {
     const response = await request(app)
-    .post(SIGNUP_ROUTE)
-    .send(userInfo)
-    .expect(200)
+      .post(SIGNUP_ROUTE)
+      .send(userInfo)
+      .expect(200);
 
-    expect(response.body.email).toEqual(userInfo.email)
-  })
+    const user = await User.findOne({ email: response.body.email });
 
-  it('does not allow saving a user with a duplicate email' , () => {
+    const userEmail = user ? user.email : '';
+    expect(user).toBeDefined();
+    expect(userEmail).toEqual(userInfo.email);
+  });
 
-  })
-})
+  it('does not allow saving a user with a duplicate email', async () => {
+    const response = await request(app)
+      .post(SIGNUP_ROUTE)
+      .send(userInfo)
+      .expect(200);
+  });
+});

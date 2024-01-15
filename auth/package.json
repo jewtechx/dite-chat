@@ -17,7 +17,9 @@
   "jest": {
     "testEnvironment": "node",
     "preset": "ts-jest",
-    "setupFilesAfterEnv":["./src/test-utils/setup-after-env.ts"]
+    "setupFilesAfterEnv": [
+      "./src/test-utils/setup-after-env.ts"
+    ]
   },
   "keywords": [],
   "author": "Jew Larbi Danquah",
@@ -25,6 +27,7 @@
   "dependencies": {
     "@typescript-eslint/parser": "^6.17.0",
     "body-parser": "^1.20.2",
+    "mongodb-memory-server": "^9.1.4",
     "express": "^4.18.2",
     "express-validator": "^7.0.1",
     "mongoose": "^8.0.4",
@@ -47,7 +50,6 @@
     "eslint-plugin-prettier": "^5.1.2",
     "jest": "^29.7.0",
     "lint-staged": "^15.2.0",
-    "mongodb-memory-server": "^9.1.4",
     "prettier": "^3.1.1",
     "supertest": "^6.3.3",
     "ts-jest": "^29.1.1"
