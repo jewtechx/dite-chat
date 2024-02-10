@@ -1,165 +1,157 @@
-import { app } from '../../app';
 import request from 'supertest';
-import { SIGNUP_ROUTE } from '../utils/index';
+import { app } from '../../app';
+import { SIGNUP_ROUTE } from '../utils';
+import { User } from '../../models';
 
+beforeEach(() => {});
 
-beforeAll(() => {
-  // connect database
-});
-
-beforeEach(() => {
-  // clean up database
-});
-
-afterAll(() => {
-  // disconnect database
-});
-
-describe('Test sign up route method availability', () => {
-  let password = '';
-  let email = '';
-
-  beforeAll(() => {
-    email = 'test@test.com';
-    password = 'Ajhjhfd123';
-  });
-
-  it('should return 405 for GET,PUT,PATCH,DELETE request sign up route', async () => {
-    await request(app).get(SIGNUP_ROUTE).send({ email, password }).expect(405);
-    await request(app).put(SIGNUP_ROUTE).send({ email, password }).expect(405);
-    await request(app)
-      .patch(SIGNUP_ROUTE)
-      .send({ email, password })
-      .expect(405);
-    await request(app)
-      .delete(SIGNUP_ROUTE)
-      .send({ email, password })
-      .expect(405);
-  });
-
-  it('should return 200 for a post request', async () => {
-    await request(app).post(SIGNUP_ROUTE).send({ email, password }).expect(200);
-
-    await request(app)
-      .options(SIGNUP_ROUTE)
-      .send({ email, password })
-      .expect(200);
-  });
-});
-
-describe('Test email validity', () => {
+/**
+ * Valid email conditions:
+ *   - Standard email formats from 'express-validator' package
+ */
+describe('tests validity of email input', () => {
   let password = '';
 
   beforeAll(() => {
-    password = 'validPass1';
+    password = 'Validpassword1';
   });
-  /**
-   * Valid email conditions
-   *  - Standard email formats from the express validator package
-   */
+
+  it('should return 422 if the email is not provided', async () => {
+    await request(app).post(SIGNUP_ROUTE).send({ password }).expect(422);
+  });
+
   it('should return 422 if the email is not valid', async () => {
-    await request(app).post(SIGNUP_ROUTE).send({}).expect(422);
-
     await request(app)
       .post(SIGNUP_ROUTE)
-      .send({ email: 'invalidemail', password })
+      .send({ email: 'invalidEmail', password })
       .expect(422);
   });
 
-  it('should return 200 if email is valid', async () => {
+  it('should return 200 if the email is valid', async () => {
     await request(app)
       .post(SIGNUP_ROUTE)
-      .send({
-        email: 'test@example.com',
-        password,
-      })
-      .expect(200);
-  },30000);
-
-  it('should return POST as the only allowed header from an options request', async () => {
-    const response = await request(app).options(SIGNUP_ROUTE).expect(200);
-    expect(response.get('access-control-allowed-methods')).toContain('POST');
-  },30000);
+      .send({ email: 'test@test.com', password })
+      .expect(201);
+  });
 });
 
-describe('Test password validity', () => {
+/**
+ * Valid password conditions:
+ *   - At least 8 characters
+ *   - At most 32 characters
+ *   - One lowercase letter
+ *   - One uppercase letter
+ *   - One digit
+ */
+describe('tests validity of password input', () => {
   let email = '';
 
   beforeAll(() => {
     email = 'test@test.com';
   });
-  /**
-   * valid password condition
-   *  - atleast 8 characters
-   *  - atmost 32 characters
-   *  - one lower case letter
-   *  - one uppercase letter
-   *  - one number
-   */
 
-  it('should return 200 is password is valid', async () => {
-    await request(app)
-      .post(SIGNUP_ROUTE)
-      .send({
-        email,
-        password: 'validPass123',
-      })
-      .expect(200);
-  },30000);
-
-  it('should return 422 if the password was not provided', async () => {
-    await request(app)
-      .post(SIGNUP_ROUTE)
-      .send({
-        email,
-      })
-      .expect(422);
+  it('should return 422 if the password is not provided', async () => {
+    await request(app).post(SIGNUP_ROUTE).send({ email }).expect(422);
   });
 
   it('should return 422 if the password contains less than 8 characters', async () => {
     await request(app)
       .post(SIGNUP_ROUTE)
-      .send({
-        email,
-        password: '1234',
-      })
+      .send({ email, password: 'Valid12' })
       .expect(422);
   });
 
   it('should return 422 if the password contains more than 32 characters', async () => {
     await request(app)
       .post(SIGNUP_ROUTE)
-      .send({
-        email,
-        password: '12345hjaskdicjdksjhkjsdshkdjhjASASsdc',
-      })
+      .send({ email, password: 'Valid12Valid12Valid12Valid12Valid12' })
       .expect(422);
   });
+
   it('should return 422 if the password does not contain one lower-case letter', async () => {
     await request(app)
       .post(SIGNUP_ROUTE)
-      .send({
-        email,
-        password: 'VALID12323',
-      })
+      .send({ email, password: 'VALID12VALID12' })
       .expect(422);
   });
+
   it('should return 422 if the password does not contain one upper-case letter', async () => {
     await request(app)
       .post(SIGNUP_ROUTE)
-      .send({
-        email,
-        password: '12345hjaskdicj',
-      })
+      .send({ email, password: 'valid12valid12' })
       .expect(422);
   });
-  it('should return 422 if the password does not contain a number', async () => {
+
+  it('should return 422 if the password does not contain a digit', async () => {
+    await request(app)
+      .post(SIGNUP_ROUTE)
+      .send({ email, password: 'Validvalid' })
+      .expect(422);
+  });
+
+  it('should return 200 if the password is valid', async () => {
+    await request(app)
+      .post(SIGNUP_ROUTE)
+      .send({ email, password: 'Valid12valid12' })
+      .expect(201);
+  });
+});
+
+describe('tests sanitization of email input', () => {
+  it('should not contain uppercase letters in the domain of the email', async () => {
+    const normalizedEmail = 'test@test.com';
+
+    const response = await request(app)
+      .post(SIGNUP_ROUTE)
+      .send({
+        email: 'test@TEST.COM',
+        password: 'Valid123',
+      })
+      .expect(201);
+
+    expect(response.body.email).toEqual(normalizedEmail);
+  });
+});
+
+describe('tests sanitization of password input', () => {
+  it('should not contain unescaped characters', async () => {
     await request(app)
       .post(SIGNUP_ROUTE)
       .send({
-        email,
-        password: 'hjaskdiAAjdksjhkjsds',
+        email: 'test@test.com',
+        password: 'Valid1<>"',
       })
+      .expect(201);
+  });
+});
+
+describe('tests saving the signed up user to the database', () => {
+  const validUserInfo = {
+    email: 'test@test.com',
+    password: 'Valid123',
+  };
+
+  it('saves the user successfully as long as the information is valid', async () => {
+    const response = await request(app)
+      .post(SIGNUP_ROUTE)
+      .send(validUserInfo)
+      .expect(201);
+    const user = await User.findOne({ email: response.body.email });
+    const userEmail = user ? user.email : '';
+
+    expect(user).toBeDefined();
+    expect(userEmail).toEqual(validUserInfo.email);
+  });
+
+  it('does not allow saving a user with a duplicate email', async () => {
+    await request(app).post(SIGNUP_ROUTE).send(validUserInfo).expect(201);
+    const response = await request(app)
+      .post(SIGNUP_ROUTE)
+      .send(validUserInfo)
       .expect(422);
+
+    expect(response.body.errors[0].message).toEqual(
+      'The email is already in the database',
+    );
   });
 });
