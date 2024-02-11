@@ -1,14 +1,14 @@
-import { MongoMemoryServer } from 'mongodb-memory-server';
+// import { MongoMemoryServer } from 'mongodb-memory-server';
 import mongoose from 'mongoose';
 
-let mongoMemoryServer: MongoMemoryServer;
+// let mongoMemoryServer: MongoMemoryServer;
 
-beforeAll(async () => {
-  mongoMemoryServer = new MongoMemoryServer();
-  const mongoUri = await mongoMemoryServer.getUri();
-
-  await mongoose.connect(mongoUri);
-});
+beforeAll(
+  async () =>
+    await mongoose.connect(
+      'mongodb+srv://jwlarbi15:dittext@cluster0.jqyx1e8.mongodb.net/test',
+    ),
+);
 
 beforeEach(async () => {
   const allCollections = await mongoose.connection.db.collections();
@@ -19,6 +19,5 @@ beforeEach(async () => {
 });
 
 afterAll(async () => {
-  await mongoMemoryServer.stop();
   await mongoose.connection.close();
 });

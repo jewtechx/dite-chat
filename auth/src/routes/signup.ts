@@ -2,6 +2,8 @@ import express, { Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import { SIGNUP_ROUTE } from './utils';
 import { User } from '../models';
+import { error } from 'console';
+import { InvalidInput } from '../errors';
 
 const signUpRouter = express.Router();
 
@@ -28,7 +30,11 @@ signUpRouter.post(
     body('password').escape(),
   ],
   async (req: Request, res: Response) => {
-    // const errors = validationResult(req).array();
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      throw new InvalidInput(errors.array());
+    }
 
     if (/.+@[A-Z]/g.test(req.body.email)) {
       res.status(422);
@@ -46,11 +52,15 @@ signUpRouter.post(
       return res.sendStatus(422);
     }
 
-    const newUser = new User({ email, password });
+    try {
+      const newUser = new User({ email, password });
 
-    await newUser.save();
+      await newUser.save();
 
-    res.status(201).send({ email: req.body.email });
+      res.status(201).send({ email: req.body.email });
+    } catch (e) {
+      return res.sendStatus(422);
+    }
   },
 );
 
